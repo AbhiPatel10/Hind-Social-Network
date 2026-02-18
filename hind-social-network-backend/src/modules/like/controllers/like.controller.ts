@@ -8,9 +8,7 @@ export class LikeController {
     likePost = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const postId = req.params.postId as string;
-            const { userId } = req.body;
-
-            if (!userId) throw new AppError('userId required', 400);
+            const { userId } = req.body; // Middleware ensures checks based on DTO
 
             const likeCount = await this.likeService.likePost(postId, userId);
             res.status(200).json({

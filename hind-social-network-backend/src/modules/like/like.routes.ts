@@ -6,9 +6,12 @@ import { postRepository, likeRepository, memoryCache } from '../../shared/contai
 const service = new LikeService(likeRepository, postRepository, memoryCache);
 const controller = new LikeController(service);
 
+import { LikePostDto } from './dtos/like.dto';
+import { validationMiddleware } from '../../shared/middlewares/validation.middleware';
+
 const router = Router({ mergeParams: true });
 
-router.post('/', controller.likePost);
+router.post('/', validationMiddleware(LikePostDto), controller.likePost);
 router.delete('/', controller.unlikePost);
 
 export default router;

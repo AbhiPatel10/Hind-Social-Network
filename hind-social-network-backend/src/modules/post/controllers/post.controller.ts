@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { PostService } from '../services/post.service';
 import { CreatePostDto } from '../dtos/post.dto';
-import { validate } from 'class-validator';
-import { plainToClass } from 'class-transformer';
 import { AppError } from '../../../shared/utils/app-error';
 
 export class PostController {
@@ -10,12 +8,7 @@ export class PostController {
 
     createPost = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const dto = plainToClass(CreatePostDto, req.body);
-            const errors = await validate(dto);
-            if (errors.length > 0) {
-                throw new AppError('Validation failed: ' + errors.toString(), 400);
-            }
-
+            const dto = req.body as CreatePostDto; // Middleware ensures validity
             const post = await this.postService.createPost(dto);
             res.status(201).json({
                 success: true,

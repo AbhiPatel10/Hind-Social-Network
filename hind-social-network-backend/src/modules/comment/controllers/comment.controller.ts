@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { CommentService } from '../services/comment.service';
 import { CreateCommentDto } from '../dtos/comment.dto';
-import { validate } from 'class-validator';
-import { plainToClass } from 'class-transformer';
 import { AppError } from '../../../shared/utils/app-error';
 
 export class CommentController {
@@ -11,9 +9,7 @@ export class CommentController {
     createComment = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const postId = req.params.postId as string;
-            const dto = plainToClass(CreateCommentDto, req.body);
-            const errors = await validate(dto);
-            if (errors.length > 0) throw new AppError('Validation failed: ' + errors.toString(), 400);
+            const dto = req.body as CreateCommentDto;
 
             const comment = await this.commentService.addComment(postId, dto);
             res.status(201).json({
