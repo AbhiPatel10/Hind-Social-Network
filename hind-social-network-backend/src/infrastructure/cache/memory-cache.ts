@@ -6,7 +6,7 @@ export interface CacheAdapter {
 }
 
 export class MemoryCache implements CacheAdapter {
-    private cache: Map<string, { value: any; expireAt: number }> = new Map();
+    private cache: Map<string, { value: unknown; expireAt: number }> = new Map();
 
     async get<T>(key: string): Promise<T | null> {
         const item = this.cache.get(key);

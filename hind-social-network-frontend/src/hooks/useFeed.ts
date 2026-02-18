@@ -7,12 +7,12 @@ interface FetchFeedResponse {
     nextCursor?: string;
 }
 
-export function useFeed() {
+export function useFeed(searchQuery?: string) {
     return useInfiniteQuery<FetchFeedResponse, Error>({
-        queryKey: ['feed'],
+        queryKey: ['feed', searchQuery],
         queryFn: async ({ pageParam = undefined }) => {
             const res = await api.get('/posts/feed', {
-                params: { cursor: pageParam, userId: 'user-1' },
+                params: { cursor: pageParam, userId: 'user-1', search: searchQuery },
             });
             return {
                 data: res.data.data.posts,

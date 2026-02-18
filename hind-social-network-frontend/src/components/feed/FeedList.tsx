@@ -5,7 +5,12 @@ import PostCard from '@/components/post/PostCard';
 import PostSkeleton from '@/components/post/PostSkeleton';
 import { useEffect, useRef } from 'react';
 
+import { useSearchParams } from 'next/navigation';
+
 export default function FeedList() {
+    const searchParams = useSearchParams();
+    const searchQuery = searchParams.get('q') || undefined;
+
     const {
         data,
         fetchNextPage,
@@ -13,7 +18,7 @@ export default function FeedList() {
         isFetchingNextPage,
         isLoading,
         isError
-    } = useFeed();
+    } = useFeed(searchQuery);
 
     const loadMoreRef = useRef<HTMLDivElement>(null);
 

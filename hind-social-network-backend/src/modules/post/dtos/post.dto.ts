@@ -16,19 +16,3 @@ export class CreatePostDto {
     mediaUrls?: string[];
 }
 
-export class CreateCommentDto {
-    @IsString()
-    @IsNotEmpty()
-    userId!: string;
-
-    @IsString()
-    @IsNotEmpty()
-    @MaxLength(200)
-    content!: string;
-}
-
-export class LikePostDto {
-    @IsString()
-    @IsNotEmpty()
-    userId!: string;
-}

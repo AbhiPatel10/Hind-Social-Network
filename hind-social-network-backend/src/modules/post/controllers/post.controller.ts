@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { PostService } from '../services/post.service';
-import { CreatePostDto, CreateCommentDto, LikePostDto } from '../dtos/post.dto';
+import { CreatePostDto } from '../dtos/post.dto';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { AppError } from '../../../shared/utils/app-error';
@@ -32,8 +32,9 @@ export class PostController {
             const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
             const cursor = req.query.cursor as string | undefined;
             const requestingUserId = req.query.userId as string | undefined;
+            const searchQuery = req.query.search as string | undefined;
 
-            const result = await this.postService.getFeed(limit, cursor, requestingUserId);
+            const result = await this.postService.getFeed(limit, cursor, requestingUserId, searchQuery);
             res.status(200).json({
                 success: true,
                 message: 'Feed fetched successfully',
@@ -59,76 +60,7 @@ export class PostController {
         }
     };
 
-    likePost = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const postId = req.params.postId as string;
-            const { userId } = req.body;
 
-            if (!userId) throw new AppError('userId required', 400);
-
-            const likeCount = await this.postService.likePost(postId, userId);
-            res.status(200).json({
-                success: true,
-                message: 'Post liked',
-                data: { likeCount },
-            });
-        } catch (error) {
-            next(error);
-        }
-    };
-
-    unlikePost = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const postId = req.params.postId as string;
-            const userId = req.query.userId as string;
-
-            if (!userId) throw new AppError('userId required', 400);
-
-            const likeCount = await this.postService.unlikePost(postId, userId);
-            res.status(200).json({
-                success: true,
-                message: 'Post unliked',
-                data: { likeCount }
-            });
-        } catch (error) {
-            next(error);
-        }
-    };
-
-    commentPost = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const postId = req.params.postId as string;
-            const dto = plainToClass(CreateCommentDto, req.body);
-            const errors = await validate(dto);
-            if (errors.length > 0) throw new AppError('Validation failed', 400);
-
-            const comment = await this.postService.addComment(postId, dto);
-            res.status(201).json({
-                success: true,
-                message: 'Comment added',
-                data: comment
-            });
-        } catch (error) {
-            next(error);
-        }
-    };
-
-    getComments = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const postId = req.params.postId as string;
-            const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
-            const cursor = req.query.cursor as string | undefined;
-
-            const result = await this.postService.getComments(postId, limit, cursor);
-            res.status(200).json({
-                success: true,
-                message: 'Comments fetched successfully',
-                data: result
-            });
-        } catch (error) {
-            next(error);
-        }
-    };
 
     sharePost = async (req: Request, res: Response, next: NextFunction) => {
         try {

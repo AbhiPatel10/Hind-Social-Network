@@ -31,8 +31,9 @@ export class FileStorage implements StorageAdapter {
             await fs.access(filePath);
             const data = await fs.readFile(filePath, 'utf-8');
             return JSON.parse(data);
-        } catch (error: any) {
-            if (error.code === 'ENOENT') {
+        } catch (error: unknown) {
+            const err = error as any;
+            if (err.code === 'ENOENT') {
                 return [] as unknown as T; // Default to empty array if file doesn't exist
             }
             throw error;

@@ -1,12 +1,27 @@
 'use client';
 
 import Link from 'next/link';
-import { Bell, Home, MessageSquare, PlusSquare, Search, User } from 'lucide-react';
+import { Bell, PlusSquare, Search } from 'lucide-react';
 import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import CreatePostModal from '@/components/post/CreatePostModal';
 
 export default function Navbar() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        const params = new URLSearchParams(searchParams);
+        if (searchQuery) {
+            params.set('q', searchQuery);
+        } else {
+            params.delete('q');
+        }
+        router.push(`/?${params.toString()}`);
+    };
 
     return (
         <>
@@ -21,13 +36,18 @@ export default function Navbar() {
                             </div>
                         </div>
                         <div className="flex items-center space-x-2 sm:space-x-4">
-                            <button className="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition-colors hidden sm:block">
-                                <Search className="w-5 h-5" />
-                            </button>
-
-                            <Link href="/" className="p-2 text-gray-900 bg-gray-100 rounded-full">
-                                <Home className="w-5 h-5" />
-                            </Link>
+                            <form onSubmit={handleSearch} className="relative hidden sm:block">
+                                <input
+                                    type="text"
+                                    placeholder="Search posts..."
+                                    className="bg-gray-100 rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-64"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                                <button type="submit" className="absolute left-0 top-0 mt-2 ml-3 text-gray-400">
+                                    <Search className="w-5 h-5" />
+                                </button>
+                            </form>
 
                             <button
                                 onClick={() => setIsCreateModalOpen(true)}
@@ -37,9 +57,6 @@ export default function Navbar() {
                                 <span className="text-sm font-medium hidden sm:inline">Create</span>
                             </button>
 
-                            <button className="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition-colors">
-                                <MessageSquare className="w-5 h-5" />
-                            </button>
                             <button className="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition-colors">
                                 <Bell className="w-5 h-5" />
                             </button>

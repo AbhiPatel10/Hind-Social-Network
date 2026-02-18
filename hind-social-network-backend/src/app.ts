@@ -2,6 +2,8 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import postRouter from './modules/post/post.routes';
+import commentRouter from './modules/comment/comment.routes';
+import likeRouter from './modules/like/like.routes';
 import { AppError } from './shared/utils/app-error';
 
 import { rateLimiter } from './shared/middlewares/rate-limit.middleware';
@@ -19,6 +21,8 @@ app.use(loggingMiddleware); // Replaces morgan
 
 // Routes
 app.use('/posts', postRouter);
+app.use('/posts/:postId/comments', commentRouter);
+app.use('/posts/:postId/like', likeRouter);
 
 // Health & Metrics
 app.get('/health', (req, res) => {

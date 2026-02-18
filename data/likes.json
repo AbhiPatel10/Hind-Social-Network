@@ -3,12 +3,18 @@
     "likeId": "generated-on-read",
     "postId": "29de13c3-a8c9-4449-a7b8-3a9d6ea870cf",
     "userId": "user-1",
-    "createdAt": "2026-02-18T17:38:33.455Z"
+    "createdAt": "2026-02-18T18:44:20.895Z"
   },
   {
     "likeId": "generated-on-read",
     "postId": "fa7b82f3-de80-4bdb-b987-04d0c3c1b424",
     "userId": "user-1",
-    "createdAt": "2026-02-18T17:38:33.455Z"
+    "createdAt": "2026-02-18T18:44:20.895Z"
+  },
+  {
+    "likeId": "generated-on-read",
+    "postId": "1bd4d216-2dad-4558-80ac-609f9b45345e",
+    "userId": "user-1",
+    "createdAt": "2026-02-18T18:44:20.895Z"
   }
 ]

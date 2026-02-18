@@ -1,10 +1,13 @@
 import FeedList from '@/components/feed/FeedList';
 import Navbar from '@/components/layout/Navbar';
+import { Suspense } from 'react';
 
 export default function Home() {
   return (
     <>
-      <Navbar />
+      <Suspense fallback={<nav className="h-16 bg-white border-b border-gray-200" />}>
+        <Navbar />
+      </Suspense>
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <div className="flex gap-8 justify-center lg:justify-center">
           <div className="w-full max-w-xl">
@@ -16,7 +19,9 @@ export default function Home() {
                 <span className="font-medium text-gray-900 cursor-pointer">Latest</span>
               </div>
             </div>
-            <FeedList />
+            <Suspense fallback={<div className="h-40 bg-gray-100 rounded animate-pulse" />}>
+              <FeedList />
+            </Suspense>
           </div>
         </div>
       </main>

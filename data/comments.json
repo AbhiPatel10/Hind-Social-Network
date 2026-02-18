@@ -12,5 +12,12 @@
     "userId": "user-1",
     "content": "Test Data",
     "createdAt": "2026-02-18T16:38:16.823Z"
+  },
+  {
+    "commentId": "0877156a-5a14-4d96-a245-ad01e21850ef",
+    "postId": "1bd4d216-2dad-4558-80ac-609f9b45345e",
+    "userId": "user-1",
+    "content": "Hello",
+    "createdAt": "2026-02-18T18:44:22.601Z"
   }
 ]
