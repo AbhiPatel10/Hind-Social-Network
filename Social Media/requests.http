@@ -1,0 +1,49 @@
+### Health Check
+GET http://localhost:3000/health
+
+### Create Post
+POST http://localhost:3000/posts
+Content-Type: application/json
+
+{
+  "userId": "user-123",
+  "content": "Hello World! This is my first post.",
+  "mediaUrls": ["http://example.com/image.jpg"]
+}
+
+### Get Feed
+GET http://localhost:3000/posts/feed?limit=5
+
+### Get Single Post (Replace :postId)
+GET http://localhost:3000/posts/:postId
+
+### Like Post (Replace :postId)
+POST http://localhost:3000/posts/:postId/like
+Content-Type: application/json
+
+{
+  "userId": "user-456"
+}
+
+### Unlike Post (Replace :postId)
+DELETE http://localhost:3000/posts/:postId/like?userId=user-456
+
+### Add Comment (Replace :postId)
+POST http://localhost:3000/posts/:postId/comments
+Content-Type: application/json
+
+{
+  "userId": "user-789",
+  "content": "Great post!"
+}
+
+### Get Comments (Replace :postId)
+GET http://localhost:3000/posts/:postId/comments?limit=5
+
+### Share Post (Replace :postId)
+POST http://localhost:3000/posts/:postId/share
+Content-Type: application/json
+
+{
+    "userId": "user-999"
+}

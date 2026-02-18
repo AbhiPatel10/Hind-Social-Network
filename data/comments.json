@@ -1,0 +1,16 @@
+[
+  {
+    "commentId": "2d144c8a-4355-4970-8d34-5067282b91f2",
+    "postId": "fa7b82f3-de80-4bdb-b987-04d0c3c1b424",
+    "userId": "user-1",
+    "content": "sds",
+    "createdAt": "2026-02-18T12:43:13.209Z"
+  },
+  {
+    "commentId": "ab444669-eb65-4453-91b7-e80fc59f0080",
+    "postId": "29de13c3-a8c9-4449-a7b8-3a9d6ea870cf",
+    "userId": "user-1",
+    "content": "Test Data",
+    "createdAt": "2026-02-18T16:38:16.823Z"
+  }
+]
