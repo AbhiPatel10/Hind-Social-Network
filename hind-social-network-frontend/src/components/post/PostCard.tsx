@@ -126,11 +126,63 @@ export default function PostCard({ post }: PostCardProps) {
 
                 {/* Media */}
                 {post.mediaUrls && post.mediaUrls.length > 0 && (
-                    <div className="mb-4 rounded-lg overflow-hidden border border-gray-100">
-                        {/* Simplified media display for now */}
-                        <div className="bg-gray-100 h-64 w-full flex items-center justify-center text-gray-400">
-                            Media Preview
-                        </div>
+                    <div className="mb-4 space-y-2">
+                        {post.mediaUrls.map((url, index) => {
+                            // Improved video detection
+                            const isVideo = /\.(mp4|webm|ogg|mov)(\?|$)/i.test(url);
+                            // Simple YouTube detection
+                            const isYouTube = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/i.test(url);
+
+                            if (isYouTube) {
+                                let videoId = '';
+                                try {
+                                    if (url.includes('youtu.be')) {
+                                        videoId = url.split('youtu.be/')[1]?.split('?')[0];
+                                    } else if (url.includes('youtube.com/watch')) {
+                                        videoId = new URLSearchParams(new URL(url).search).get('v') || '';
+                                    } else if (url.includes('youtube.com/embed/')) {
+                                        videoId = url.split('embed/')[1]?.split('?')[0];
+                                    }
+                                } catch (e) {
+                                    console.error('Error parsing YouTube URL:', e);
+                                }
+
+                                if (videoId) {
+                                    return (
+                                        <div key={index} className="rounded-lg overflow-hidden border border-gray-100 aspect-video">
+                                            <iframe
+                                                width="100%"
+                                                height="100%"
+                                                src={`https://www.youtube.com/embed/${videoId}`}
+                                                title={`YouTube video player ${index + 1}`}
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                                className="w-full h-full"
+                                            ></iframe>
+                                        </div>
+                                    );
+                                }
+                            }
+
+                            return (
+                                <div key={index} className="rounded-lg overflow-hidden border border-gray-100">
+                                    {isVideo ? (
+                                        <video controls className="w-full h-auto max-h-96 object-contain bg-black">
+                                            <source src={url} />
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    ) : (
+                                        <img
+                                            src={url}
+                                            alt={`Post attachment ${index + 1}`}
+                                            className="w-full h-auto max-h-96 object-cover"
+                                            loading="lazy"
+                                        />
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
 

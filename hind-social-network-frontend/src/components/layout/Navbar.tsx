@@ -22,7 +22,10 @@ export default function Navbar() {
 
     // Effect to update URL when debounced value changes
     useEffect(() => {
-        const params = new URLSearchParams(searchParams);
+        const currentQuery = searchParams.get('q') || '';
+        if (currentQuery === debouncedSearchQuery) return;
+
+        const params = new URLSearchParams(searchParams.toString());
         if (debouncedSearchQuery) {
             params.set('q', debouncedSearchQuery);
         } else {

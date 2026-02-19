@@ -43,7 +43,7 @@ src/
 2.  **Environment Setup:**
     Create a `.env.local` file in the root directory:
     ```env
-    NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+    NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
     ```
 
 3.  **Run Development Server:**
