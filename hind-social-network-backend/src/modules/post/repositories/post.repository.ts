@@ -41,7 +41,6 @@ export class PostRepository {
         });
         this.sortFeedIndex();
 
-        console.log(`[Repository] Initialized with ${this.posts.size} posts.`);
     }
 
     private sortFeedIndex() {

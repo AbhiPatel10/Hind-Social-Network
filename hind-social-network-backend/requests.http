@@ -1,8 +1,8 @@
 ### Health Check
-GET http://localhost:3000/health
+GET http://localhost:8080/health
 
 ### Create Post
-POST http://localhost:3000/posts
+POST http://localhost:8080/posts
 Content-Type: application/json
 
 {
@@ -12,13 +12,13 @@ Content-Type: application/json
 }
 
 ### Get Feed
-GET http://localhost:3000/posts/feed?limit=5
+GET http://localhost:8080/posts/feed?limit=5
 
 ### Get Single Post (Replace :postId)
-GET http://localhost:3000/posts/:postId
+GET http://localhost:8080/posts/:postId
 
 ### Like Post (Replace :postId)
-POST http://localhost:3000/posts/:postId/like
+POST http://localhost:8080/posts/:postId/like
 Content-Type: application/json
 
 {
@@ -26,10 +26,10 @@ Content-Type: application/json
 }
 
 ### Unlike Post (Replace :postId)
-DELETE http://localhost:3000/posts/:postId/like?userId=user-456
+DELETE http://localhost:8080/posts/:postId/like?userId=user-456
 
 ### Add Comment (Replace :postId)
-POST http://localhost:3000/posts/:postId/comments
+POST http://localhost:8080/posts/:postId/comments
 Content-Type: application/json
 
 {
@@ -38,10 +38,10 @@ Content-Type: application/json
 }
 
 ### Get Comments (Replace :postId)
-GET http://localhost:3000/posts/:postId/comments?limit=5
+GET http://localhost:8080/posts/:postId/comments?limit=5
 
 ### Share Post (Replace :postId)
-POST http://localhost:3000/posts/:postId/share
+POST http://localhost:8080/posts/:postId/share
 Content-Type: application/json
 
 {
