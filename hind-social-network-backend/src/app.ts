@@ -45,6 +45,10 @@ app.get('/metrics', (req, res) => {
     });
 });
 
+app.use((req: Request, res: Response) => {
+    res.status(404).json({ message: "This endpoint is not available." });
+});
+
 // Error Handling Middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof AppError) {
