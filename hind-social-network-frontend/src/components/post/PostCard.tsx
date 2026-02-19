@@ -10,6 +10,8 @@ import { api } from '@/services/api';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import CommentSection from '@/components/comment/CommentSection';
+import ShareModal from './ShareModal';
+import Link from 'next/link';
 
 interface PostCardProps {
     post: Post;
@@ -20,6 +22,7 @@ export default function PostCard({ post }: PostCardProps) {
     const [isLiked, setIsLiked] = useState(post.hasLiked);
     const [likeCount, setLikeCount] = useState(post.likeCount);
     const [showComments, setShowComments] = useState(false);
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
     // Sync local state with prop updates (e.g. from refetch)
     useEffect(() => {
@@ -82,182 +85,203 @@ export default function PostCard({ post }: PostCardProps) {
         },
     });
 
-    const handleShare = async () => {
+    const handleShareClick = () => {
+        setIsShareModalOpen(true);
+    };
+
+    const handleShareAction = async (platform: string) => {
         try {
             await api.post(`/posts/${post.id}/share`, { userId });
-            toast.success('Post shared!');
+            toast.success(`Shared via ${platform}!`);
             queryClient.invalidateQueries({ queryKey: ['feed'] });
         } catch (error) {
-            toast.error('Failed to share');
+            console.error('Share error:', error);
+            // toast.error('Failed to record share'); // Optional: don't disturb user if just tracking failed
         }
-    }
+    };
+
+    // Construct a shareable URL (assuming frontend route /posts/:id exists or using current page)
+    const shareUrl = typeof window !== 'undefined'
+        ? `${window.location.origin}/posts/${post.id}`
+        : `http://localhost:3000/posts/${post.id}`;
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-4 hover:shadow-md transition-shadow"
-        >
-            <div className="p-4">
-                {/* Header */}
-                <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center space-x-3">
-                        <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-100">
-                            {/* Placeholder or actual image */}
-                            <div className="flex items-center justify-center h-full w-full bg-indigo-100 text-indigo-600 font-bold">
-                                {post.user.name[0]}
+        <>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-4 hover:shadow-md transition-shadow"
+            >
+                <div className="p-4">
+                    {/* Header */}
+                    <div className="flex justify-between items-start mb-4">
+                        <div className="flex items-center space-x-3">
+                            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-100">
+                                {/* Placeholder or actual image */}
+                                <div className="flex items-center justify-center h-full w-full bg-indigo-100 text-indigo-600 font-bold">
+                                    {post.user.name[0]}
+                                </div>
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-gray-900 leading-tight">{post.user.name}</h3>
+                                <p className="text-sm text-gray-500">@{post.user.username} · {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</p>
                             </div>
                         </div>
-                        <div>
-                            <h3 className="font-semibold text-gray-900 leading-tight">{post.user.name}</h3>
-                            <p className="text-sm text-gray-500">@{post.user.username} · {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</p>
-                        </div>
+                        <button className="text-gray-400 hover:text-gray-600">
+                            <MoreHorizontal className="w-5 h-5" />
+                        </button>
                     </div>
-                    <button className="text-gray-400 hover:text-gray-600">
-                        <MoreHorizontal className="w-5 h-5" />
-                    </button>
-                </div>
 
-                {/* Content */}
-                <p className="text-gray-800 text-base mb-4 whitespace-pre-wrap leading-relaxed">
-                    {post.content}
-                </p>
+                    {/* Content */}
+                    <Link href={`/posts/${post.id}`} className="block group">
+                        <p className="text-gray-800 text-base mb-4 whitespace-pre-wrap leading-relaxed group-hover:text-gray-600 transition-colors">
+                            {post.content}
+                        </p>
+                    </Link>
 
-                {/* Media */}
-                {post.mediaUrls && post.mediaUrls.length > 0 && (
-                    <div className="mb-4 space-y-2">
-                        {post.mediaUrls.map((url, index) => {
-                            // Improved video detection
-                            const isVideo = /\.(mp4|webm|ogg|mov)(\?|$)/i.test(url);
-                            // Simple YouTube detection
-                            const isYouTube = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/i.test(url);
+                    {/* Media */}
+                    {post.mediaUrls && post.mediaUrls.length > 0 && (
+                        <div className="mb-4 space-y-2">
+                            {post.mediaUrls.map((url, index) => {
+                                // Improved video detection
+                                const isVideo = /\.(mp4|webm|ogg|mov)(\?|$)/i.test(url);
+                                // Simple YouTube detection
+                                const isYouTube = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/i.test(url);
 
-                            if (isYouTube) {
-                                let videoId = '';
-                                try {
-                                    if (url.includes('youtu.be')) {
-                                        videoId = url.split('youtu.be/')[1]?.split('?')[0];
-                                    } else if (url.includes('youtube.com/watch')) {
-                                        videoId = new URLSearchParams(new URL(url).search).get('v') || '';
-                                    } else if (url.includes('youtube.com/embed/')) {
-                                        videoId = url.split('embed/')[1]?.split('?')[0];
+                                if (isYouTube) {
+                                    let videoId = '';
+                                    try {
+                                        if (url.includes('youtu.be')) {
+                                            videoId = url.split('youtu.be/')[1]?.split('?')[0];
+                                        } else if (url.includes('youtube.com/watch')) {
+                                            videoId = new URLSearchParams(new URL(url).search).get('v') || '';
+                                        } else if (url.includes('youtube.com/embed/')) {
+                                            videoId = url.split('embed/')[1]?.split('?')[0];
+                                        }
+                                    } catch (e) {
+                                        console.error('Error parsing YouTube URL:', e);
                                     }
-                                } catch (e) {
-                                    console.error('Error parsing YouTube URL:', e);
+
+                                    if (videoId) {
+                                        return (
+                                            <div key={index} className="rounded-lg overflow-hidden border border-gray-100 aspect-video">
+                                                <iframe
+                                                    width="100%"
+                                                    height="100%"
+                                                    src={`https://www.youtube.com/embed/${videoId}`}
+                                                    title={`YouTube video player ${index + 1}`}
+                                                    frameBorder="0"
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                    allowFullScreen
+                                                    className="w-full h-full"
+                                                ></iframe>
+                                            </div>
+                                        );
+                                    }
                                 }
 
-                                if (videoId) {
-                                    return (
-                                        <div key={index} className="rounded-lg overflow-hidden border border-gray-100 aspect-video">
-                                            <iframe
-                                                width="100%"
-                                                height="100%"
-                                                src={`https://www.youtube.com/embed/${videoId}`}
-                                                title={`YouTube video player ${index + 1}`}
-                                                frameBorder="0"
-                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                allowFullScreen
-                                                className="w-full h-full"
-                                            ></iframe>
-                                        </div>
-                                    );
-                                }
-                            }
-
-                            return (
-                                <div key={index} className="rounded-lg overflow-hidden border border-gray-100">
-                                    {isVideo ? (
-                                        <video controls className="w-full h-auto max-h-96 object-contain bg-black">
-                                            <source src={url} />
-                                            Your browser does not support the video tag.
-                                        </video>
-                                    ) : (
-                                        <img
-                                            src={url}
-                                            alt={`Post attachment ${index + 1}`}
-                                            className="w-full h-auto max-h-96 object-cover"
-                                            loading="lazy"
-                                        />
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-
-                {/* Footer Actions */}
-                <div className="flex items-center justify-between pt-2 border-t border-gray-50">
-                    {/* Like */}
-                    <button
-                        onClick={() => toggleLike(isLiked ? 'unlike' : 'like')}
-                        className={cn(
-                            "flex items-center space-x-2 px-2 py-1.5 rounded-lg transition-colors group",
-                            isLiked ? "text-red-500 hover:bg-red-50" : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                        )}
-                    >
-                        <div className="relative">
-                            <AnimatePresence mode="wait">
-                                {isLiked ? (
-                                    <motion.div
-                                        key="liked"
-                                        initial={{ scale: 0 }}
-                                        animate={{ scale: 1 }}
-                                        exit={{ scale: 0 }}
-                                    >
-                                        <Heart className="w-5 h-5 fill-current" />
-                                    </motion.div>
-                                ) : (
-                                    <motion.div
-                                        key="unliked"
-                                        initial={{ scale: 0 }}
-                                        animate={{ scale: 1 }}
-                                        exit={{ scale: 0 }}
-                                    >
-                                        <Heart className="w-5 h-5" />
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+                                return (
+                                    <div key={index} className="rounded-lg overflow-hidden border border-gray-100">
+                                        {isVideo ? (
+                                            <video controls className="w-full h-auto max-h-96 object-contain bg-black">
+                                                <source src={url} />
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        ) : (
+                                            <img
+                                                src={url}
+                                                alt={`Post attachment ${index + 1}`}
+                                                className="w-full h-auto max-h-96 object-cover"
+                                                loading="lazy"
+                                            />
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
-                        <span className="text-sm font-medium">{likeCount}</span>
-                    </button>
+                    )}
 
-                    {/* Comment */}
-                    <button
-                        onClick={() => setShowComments(!showComments)}
-                        className={cn(
-                            "flex items-center space-x-2 px-2 py-1.5 rounded-lg transition-colors",
-                            showComments ? "text-indigo-600 bg-indigo-50" : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    {/* Footer Actions */}
+                    <div className="flex items-center justify-between pt-2 border-t border-gray-50">
+                        {/* Like */}
+                        <button
+                            onClick={() => toggleLike(isLiked ? 'unlike' : 'like')}
+                            className={cn(
+                                "flex items-center space-x-2 px-2 py-1.5 rounded-lg transition-colors group",
+                                isLiked ? "text-red-500 hover:bg-red-50" : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                            )}
+                        >
+                            <div className="relative">
+                                <AnimatePresence mode="wait">
+                                    {isLiked ? (
+                                        <motion.div
+                                            key="liked"
+                                            initial={{ scale: 0 }}
+                                            animate={{ scale: 1 }}
+                                            exit={{ scale: 0 }}
+                                        >
+                                            <Heart className="w-5 h-5 fill-current" />
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div
+                                            key="unliked"
+                                            initial={{ scale: 0 }}
+                                            animate={{ scale: 1 }}
+                                            exit={{ scale: 0 }}
+                                        >
+                                            <Heart className="w-5 h-5" />
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                            <span className="text-sm font-medium">{likeCount}</span>
+                        </button>
+
+                        {/* Comment */}
+                        <button
+                            onClick={() => setShowComments(!showComments)}
+                            className={cn(
+                                "flex items-center space-x-2 px-2 py-1.5 rounded-lg transition-colors",
+                                showComments ? "text-indigo-600 bg-indigo-50" : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                            )}
+                        >
+                            <MessageCircle className="w-5 h-5" />
+                            <span className="text-sm font-medium">{post.commentCount}</span>
+                        </button>
+
+                        {/* Share */}
+                        <button
+                            onClick={handleShareClick}
+                            className="flex items-center space-x-2 px-2 py-1.5 rounded-lg text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors"
+                        >
+                            <Share2 className="w-5 h-5" />
+                            <span className="text-sm font-medium">{post.shareCount}</span>
+                        </button>
+                    </div>
+
+                    {/* Comments Section */}
+                    <AnimatePresence>
+                        {showComments && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="overflow-hidden"
+                            >
+                                <CommentSection postId={post.id} />
+                            </motion.div>
                         )}
-                    >
-                        <MessageCircle className="w-5 h-5" />
-                        <span className="text-sm font-medium">{post.commentCount}</span>
-                    </button>
-
-                    {/* Share */}
-                    <button
-                        onClick={handleShare}
-                        className="flex items-center space-x-2 px-2 py-1.5 rounded-lg text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors"
-                    >
-                        <Share2 className="w-5 h-5" />
-                        <span className="text-sm font-medium">{post.shareCount}</span>
-                    </button>
+                    </AnimatePresence>
                 </div>
 
-                {/* Comments Section */}
-                <AnimatePresence>
-                    {showComments && (
-                        <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden"
-                        >
-                            <CommentSection postId={post.id} />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-        </motion.div>
+                <ShareModal
+                    isOpen={isShareModalOpen}
+                    onClose={() => setIsShareModalOpen(false)}
+                    postUrl={shareUrl}
+                    onShare={handleShareAction}
+                />
+            </motion.div>
+        </>
     );
 }
