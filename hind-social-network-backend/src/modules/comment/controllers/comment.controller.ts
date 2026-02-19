@@ -1,7 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import { CommentService } from '../services/comment.service';
+import { NextFunction, Request, Response } from 'express';
 import { CreateCommentDto } from '../dtos/comment.dto';
-import { AppError } from '../../../shared/utils/app-error';
+import { CommentService } from '../services/comment.service';
 
 export class CommentController {
     constructor(private commentService: CommentService) { }

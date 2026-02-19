@@ -2,26 +2,34 @@
 
 import Link from 'next/link';
 import { Bell, PlusSquare, Search } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CreatePostModal from '@/components/post/CreatePostModal';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export default function Navbar() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
     const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+    const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
+        // Optional: Keep for immediate enter key search if desired, 
+        // but debounce handles it mostly.
+    };
+
+    // Effect to update URL when debounced value changes
+    useEffect(() => {
         const params = new URLSearchParams(searchParams);
-        if (searchQuery) {
-            params.set('q', searchQuery);
+        if (debouncedSearchQuery) {
+            params.set('q', debouncedSearchQuery);
         } else {
             params.delete('q');
         }
         router.push(`/?${params.toString()}`);
-    };
+    }, [debouncedSearchQuery, router, searchParams]);
 
     return (
         <>
